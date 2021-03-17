@@ -1,3 +1,4 @@
+using Backend.Features.LoadAllPokemon.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +19,13 @@ namespace Backend
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services =>
+                {
+                    // Need to add this here so it runs before the web host
+                    // starts listening to HTTP requests.
+                    // See: https://andrewlock.net/running-async-tasks-on-app-startup-in-asp-net-core-3/
+                    services.AddLoadAllPokemonFeature();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
