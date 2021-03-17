@@ -5,6 +5,7 @@ namespace Backend.Domain
     public class Pokemon
     {
         public int Id { get; set; }
+        public int Order { get; set; }
         public string Name { get; set; }
         public int Generation { get; set; }
         public string Artwork { get; set; }

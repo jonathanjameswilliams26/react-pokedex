@@ -12,7 +12,7 @@ namespace Backend.Features.LoadAllPokemon
     {
         private readonly HttpClient client;
         private readonly ILogger<PokeApi> logger;
-        private const int NUM_OF_POKEMON = 898;
+        private const int NUM_OF_POKEMON = 10;
 
         public PokeApi(HttpClient client, ILogger<PokeApi> logger)
         {
@@ -47,6 +47,7 @@ namespace Backend.Features.LoadAllPokemon
                     types.Add(type.Name, type);
 
                 pokemon.Types.Add(types[type.Name]);
+                types[type.Name].Pokemon.Add(pokemon);
             }
             pokemon.Generation = await GetGeneration(pokemonDTO.species.name);
             logger.LogInformation("Succesfully got Pokemon {ID}: {Name}", pokemon.Id, pokemon.Name);

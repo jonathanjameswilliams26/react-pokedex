@@ -1,4 +1,6 @@
 ﻿using Backend.Infrastructure;
+using Backend.Infrastructure.Database;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Linq;
@@ -11,24 +13,29 @@ namespace Backend.Features.LoadAllPokemon
     {
         private readonly ILogger<PreStartupTask> logger;
         private readonly PokeApi api;
-        private readonly Database database;
+        private readonly IServiceScopeFactory serviceScopeFactory;
 
-        public PreStartupTask(ILogger<PreStartupTask> logger, PokeApi api/*, Database database*/)
+        public PreStartupTask(ILogger<PreStartupTask> logger, PokeApi api, IServiceScopeFactory serviceScopeFactory)
         {
             this.logger = logger;
             this.api = api;
-            //this.database = database;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            //if (database.Pokemon.Any())
-            //    return;
+            using (var scope = serviceScopeFactory.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DB>();
+                if (db.Pokemon.Any())
+                    return;
 
-            logger.LogInformation("Loading all pokemon from PokeApi.");
-            var pokemon = await api.GetAllPokemon();
-            await database.AddRangeAsync(pokemon);
-            logger.LogInformation("Finished loading all pokemon from PokeApi.");
+                logger.LogInformation("Loading all pokemon from PokeApi.");
+                var pokemon = await api.GetAllPokemon();
+                await db.Pokemon.AddRangeAsync(pokemon);
+                await db.SaveChangesAsync();
+                logger.LogInformation("Finished loading all pokemon from PokeApi.");
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

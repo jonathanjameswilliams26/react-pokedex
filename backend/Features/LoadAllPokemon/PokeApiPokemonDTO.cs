@@ -7,7 +7,7 @@ namespace Backend.Features.LoadAllPokemon
 {
     public record PokeApiPokemonDTO
     {
-        public int id { get; set; }
+        public int order { get; set; }
         public string name { get; set; }
         public int height { get; set; }
         public int weight { get; set; }
@@ -21,7 +21,7 @@ namespace Backend.Features.LoadAllPokemon
 
         public Pokemon ToPokemon() => new Pokemon
         {
-            Id = id,
+            Order = order,
             Name = name,
             Weight = weight,
             Height = height,
